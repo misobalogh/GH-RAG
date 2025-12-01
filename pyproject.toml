@@ -1,0 +1,18 @@
+[project]
+name = "github-rag"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "dotenv>=0.9.9",
+    "pygithub>=2.8.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.1",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
