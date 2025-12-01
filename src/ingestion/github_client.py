@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
-from github import Auth, Github, Repository, ContentFile
+
+from github import Auth, Github, Repository
+
 from .models import RepoMetadata
 
 
@@ -44,6 +46,27 @@ class GitHubClient:
         "sh",
     }
 
+    EXT_TO_LANG_MAP = {
+        "py": "Python",
+        "rs": "Rust",
+        "c": "C",
+        "h": "C",
+        "cpp": "C++",
+        "hpp": "C++",
+        "cxx": "C++",
+        "cc": "C++",
+        "js": "JavaScript",
+        "ts": "TypeScript",
+        "cs": "C#",
+        "php": "PHP",
+        "r": "R",
+        "R": "R",
+        "vue": "Vue",
+        "html": "HTML",
+        "css": "CSS",
+        "sh": "Shell",
+    }
+
     DOC_EXTENSIONS = {
         "md",
         "txt",
@@ -69,7 +92,11 @@ class GitHubClient:
         return self.user.login
 
     def get_repos(self, include_private: bool = True) -> list[Repository.Repository]:
-        return [repo for repo in self.user.get_repos() if include_private or not repo.private]
+        return [
+            repo
+            for repo in self.user.get_repos()
+            if include_private or not repo.private
+        ]
 
     def get_repo_metadata(self, repo: Repository.Repository) -> RepoMetadata:
         return RepoMetadata(
@@ -85,7 +112,8 @@ class GitHubClient:
             total_commits=repo.get_commits().totalCount,
         )
 
-    def should_process_file(self, path: Path) -> bool:
+    def should_process_file(self, path: str | Path) -> bool:
+        path = Path(path)
         parts = set(path.parts)
         if parts.intersection(self.IGNORED_DIRS):
             return False
@@ -94,7 +122,14 @@ class GitHubClient:
             return False
 
         file_extension = path.suffix.lstrip(".")
-        return file_extension in self.CODE_EXTENSIONS or file_extension in self.DOC_EXTENSIONS
+        return (
+            file_extension in self.CODE_EXTENSIONS
+            or file_extension in self.DOC_EXTENSIONS
+        )
+
+    def get_language(self, file_path: str) -> str | None:
+        ext = Path(file_path).suffix.lstrip(".")
+        return self.EXT_TO_LANG_MAP.get(ext)
 
     def close(self):
         self.client.close()

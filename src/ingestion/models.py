@@ -14,3 +14,14 @@ class RepoMetadata:
     created_at: datetime | None = None
     updated_at: datetime | None = None
     total_commits: int = 0
+
+
+@dataclass
+class FileContent:
+    path: str
+    content: str
+    language: str | None
+    repo_name: str
+    repo_url: str
+    last_modified: datetime | None = None
+    size: int = 0
